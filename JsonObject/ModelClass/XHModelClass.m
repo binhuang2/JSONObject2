@@ -128,6 +128,9 @@
  @param suffix 类名（不带前缀）
  */
 - (void)addToModelClassListWithObject:(id)object suffix:(NSString *)suffix {
+    if ([suffix containsString:@"_"]) {
+        suffix = [self deleteUnderline:suffix];
+    }
     XHModelClass *nextModelClass = [[XHModelClass alloc] initWithObject:object prefix:self.classPrefix suffix:suffix.capitalizedString superName:self.superName];
     [self.modelClassList addObject:nextModelClass];
 }
@@ -196,12 +199,30 @@
  */
 - (NSString *)isReplaceKeyword:(NSString *)keyword {
     NSString *newName = [_keywordClass makeNewkeyword:keyword];
-    if (newName) {
+    //若参数带有下划线，将下划线去掉
+    BOOL isUnderline = [keyword containsString:@"_"];
+    if (newName || isUnderline) {
+        if (isUnderline) {
+            newName = [self deleteUnderline:keyword];
+        }
         self.propertyMap[newName] = keyword;
     } else {
         newName = keyword;
     }
     return newName;
+}
+
+- (NSString *)deleteUnderline:(NSString *)field {
+    NSArray <NSString *>*keyList = [field componentsSeparatedByString:@"_"];
+    NSMutableArray *newKeyList = [NSMutableArray array];
+    [keyList enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (idx > 0) {
+            [newKeyList addObject:obj.capitalizedString];
+        } else {
+            [newKeyList addObject:obj];
+        }
+    }];
+    return [newKeyList componentsJoinedByString:@""];
 }
 
 #pragma mark - 懒加载

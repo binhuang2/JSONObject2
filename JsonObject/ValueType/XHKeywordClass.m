@@ -18,7 +18,8 @@
     if (self) {
         _keywordMap = @{
                         @"id":@"debugId",
-                        @"description":@"debugDescription"
+                        @"description":@"debugDescription",
+                        @"new":@"debugNew"
                         };
     }
     return self;
